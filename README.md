@@ -29,7 +29,8 @@ How the Maze works :
 Basic turn corridor (0..3)
 ###   ###   #·#   #·#
 #··   ··#   ··#   #··
-#··   #·#   ###   ###
+#·#
+   |#·#   ###   ###
 
 Round about, go every direction (4..7)
 #·#   ···   #··   ··#
@@ -44,7 +45,7 @@ T junctions (8..11)
 Straight (12, 14)
 #·#   ###
 #·#   ···
-#·#   ···
+#·#   ###
 
 Other (14..16)
 ·#·   #··   ·#·
