@@ -1,0 +1,197 @@
+<html xstyle="overflow: hidden; width: 120%; margin: -10px; padding: 0; overflow-wrap: break-word; line-height: 14px; letter-spacing: -2px;"></html>
+<style>
+table, th, td {
+  border: 1px solid black;
+  border-collapse: collapse;
+}
+</style>
+<script>
+function RNG(seed) {
+  // LCG using GCC's constants
+  this.m = 0x80000000; // 2**31;
+  this.a = 1103515245;
+  this.c = 12345;
+
+  this.state = seed ? seed : Math.floor(Math.random() * (this.m - 1));
+}
+RNG.prototype.nextInt = function() {
+  this.state = (this.a * this.state + this.c) % this.m;
+  return this.state;
+}
+RNG.prototype.nextFloat = function() {
+  // returns in range [0,1]
+  return this.nextInt() / (this.m - 1);
+}
+RNG.prototype.nextRange = function(start, end) {
+  // returns in range [start, end): including start, excluding end
+  // can't modulu nextInt because of weak randomness in lower bits
+  var rangeSize = end - start;
+  var randomUnder1 = this.nextInt() / this.m;
+  return start + Math.floor(randomUnder1 * rangeSize);
+}
+RNG.prototype.choice = function(array) {
+  return array[this.nextRange(0, array.length)];
+}
+
+// from https://www.google.com/search?q=pseudo%20random%20z%20value%20from%20x%20and%20y%20site%3Astackoverflow.com&client=firefox-b-m&sxsrf=APq-WBvWXkfS1PQ-XKv4meX_50KQFAOGtQ%3A1643664045354&authuser=0
+// from https://stackoverflow.com/questions/8845333/how-can-i-produce-a-pseudorandom-pattern-from-x-y-coordinates-deterministically
+function getCellType(x,y,seed)
+{
+  mix = xorShift64(x) + (xorShift64(y) << 32) + 0xCAFEBABE + seed;
+  return xorShift64(mix);
+}
+
+function xorShift64( a) {
+    a ^= (a << 21);
+    a ^= (a >>> 35);
+    a ^= (a << 4);
+    return a;
+}
+
+/**
+http://xahlee.info/comp/unicode_drawing_shapes.html
+**/
+  var cells = [
+    String.fromCharCode(9622), 
+    String.fromCharCode(9623), 
+    String.fromCharCode(9624), 
+    String.fromCharCode(9629),
+    ];
+  var cells = [
+    String.fromCharCode("0x2596"), 
+    String.fromCharCode("0x2597"), 
+    String.fromCharCode("0x2598"), 
+    String.fromCharCode("0x259D"),
+    " ",        // space
+    //String.fromCharCode("0x2588"), // Full
+    String.fromCharCode("0x2599"),
+    String.fromCharCode("0x259B"),
+    String.fromCharCode("0x259C"),
+    String.fromCharCode("0x259F"),
+    ];
+  var cells = [
+    "###\n###\n###",    // 0
+    "···\n···\n···",    // 1
+    "###\n#··\n#··",  // 2
+    "###\n··#\n··#",  // 3
+    "··#\n··#\n###",  // 4
+    "#··\n#··\n###",  // 5
+    "#·#\n#·#\n#·#",  // 6
+    "###\n···\n###",  // 7
+    "X··\n···\n··X",  // 8
+    "··X\n···\nX··"
+  ];
+  
+  var cells = [
+    "###\n#··\n#·#",  // 0
+    "###\n··#\n#·#",  // 1
+    "#·#\n··#\n###",  // 2
+    "#·#\n#··\n###",  // 3
+    "#·#\n···\n#·#",  // 4
+    "#·#\n···\n###",  // 5
+    "###\n···\n#·#",  // 6
+    "#·#\n#··\n#·#",  // 7
+    "#·#\n···\n#·#",  // 8
+    "#·#\n#·#\n#·#",  // 9
+    "###\n···\n###",  // 10
+    "#··\n···\n··#",  // 11
+    "··#\n···\n#··",  // 12
+    "···\n·#·\n···",  // 13
+    // other (for easy mode, they  are round abouts)
+    "·#·\n###\n·#·",  // 14
+    "#··\n··#\n#··",  // 15
+    "·#·\n···\n#·#",  // 16
+    
+  ];
+    r = 9622;
+    for (var i = 0; i < 11; i++)
+    {
+      document.write(r+i);
+      document.write(" ");
+      document.write(String.fromCharCode(r + i));
+      document.write(" | ");
+    }
+    document.write("<hr/><pre>");
+    /**
+    for (var n = 0; n < Math.floor(0.007 * window.innerHeight * window.innerWidth); n++) 
+    {
+        //document.write(String.fromCharCode("0x" + (2571 + Math.floor(Math.random() * Math.floor(2)))));
+        //document.write(2571 + Math.floor(Math.random() * Math.floor(2)));
+        //document.write(" | ");
+        r = Math.floor(Math.random() * cells.length);
+        
+        //document.write(String.fromCharCode(9622 + r));
+        document.write(cells[r]);
+        if (n%60 == 59)
+          document.write("\n");
+    }**/
+
+    /**
+    for (var i = 0; i < 11; i++)
+    {
+      document.write(i);
+      document.write(" ");
+      document.write(String.fromCharCode(9622 + i));
+      document.write("<br/>");
+    }
+    **/
+    var rng = new RNG(1);
+    seed = 0xdeadbeaf;
+    document.write("<table width=1>");
+    for (y = -16; y < 16 ; y++)
+    {
+      document.write('<tr>');
+      for (x=-16; x < 16 ; x++)
+      {
+        
+        // Choose randomly
+        r = Math.floor(Math.random());
+        
+        r = (x << y) + (x*y);
+        
+        
+        r = rng.nextRange(0,14);
+        
+        r = (1103515245 * (x*y) + (x-y)) % 0x80000000
+        
+        //rng.state = x * y;
+        //r = rng.nextInt();
+        
+        r = (x << y) ^ (x+y);
+        
+        r = getCellType(x,y,seed);
+        r = Math.trunc(Math.abs(r)) % cells.length;
+        bg = "#"+r+r+r;
+        bg = "#fff";
+        
+        // Special item
+        i = getCellType(x,y,0xaaeeff17);
+        i = Math.trunc(Math.abs(i)) % (6 * cells.length); // Adjust with difficulty level
+        sp = "";
+        if (i == 0)
+          sp = String.fromCharCode("0x29D6"); // Clock : + 10s
+        else if (i == 1)
+          sp = String.fromCharCode("0x2661"); // Life : + 10s
+        else if (i == 2)
+          sp = String.fromCharCode("0x1F573"); // warp : teleport
+        else if (i == 3)
+          sp = String.fromCharCode("0x263A"); // ghost : wlak thru wall
+        if (x == 0 && y == 0)
+        {
+          bg = "lightblue";
+          cell = "···\n·X·\n···";
+        }
+        else
+        {
+          cell = cells[r];
+          if (sp != "" && r != 14) // Do not place items on the CROSS other cell, or it will never be accessibl (do not care about the side effect on easy mode where this cell is replaced by a reound about)
+            cell = cell.substring(0,5) + sp + cell.substring(6);
+        }
+        document.write('<td bgcolor='+bg+'>');
+        document.write(cell);
+        document.write('</td>');
+      }
+      document.write('</tr>');
+    }
+    document.write("</table>");
+</script>
