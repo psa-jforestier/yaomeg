@@ -1,0 +1,77 @@
+<html>
+
+<style>
+table, th, td {
+  border: 0px solid black;
+  border-collapse: collapse;
+}
+
+img {
+  image-rendering: pixelated
+}
+</style>
+
+<script>
+
+function getCellType(x,y,seed)
+{
+  mix = xorShift64(x) + (xorShift64(y) << 32) + 0xCAFEBABE + seed;
+  return xorShift64(mix);
+}
+
+function xorShift64( a) {
+    a ^= (a << 21);
+    a ^= (a >>> 35);
+    a ^= (a << 4);
+    return a;
+}
+var cells = [
+  "tile0_0.png", // Basic turn
+  "tile1_0.png",
+  "tile2_0.png",
+  "tile3_0.png",
+  
+  "tile0_1.png", // round about
+  "tile1_1.png",
+  "tile2_1.png",
+  "tile3_1.png",
+  
+  "tile0_2.png", // T junctions
+  "tile1_2.png",
+  "tile2_2.png",
+  "tile3_2.png",
+  
+  "tile0_3.png", // straight
+  "tile1_3.png",
+  
+  //"tile0_4.png", // other (replace by round about for easy mode)
+  //"tile1_4.png",
+  //"tile2_4.png",
+  "tile0_1.png", // round about
+  "tile1_1.png",
+  "tile2_1.png",
+];
+
+seed = 0xdeadbeaf;
+document.write("Maze build with "+cells.length+" cell type<br/>");
+document.write("<table cellspacing=0 cellpadding=0>");
+for (y = -32; y < 128 ; y++)
+{
+  document.write('<tr>');
+  for (x=-32; x < 32 ; x++)
+  {
+    r = Math.floor(Math.random() * cells.length);
+    
+    r = getCellType(x,y,seed);
+    r = Math.trunc(Math.abs(r)) % cells.length;
+    document.write("<td>");
+    document.write("<img width=16 height=16 src=" + cells[r]+"/>");
+    document.write("</td>");
+    
+  }
+  document.write('</tr>');
+}
+</script>
+</table>
+
+</html>
