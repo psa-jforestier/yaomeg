@@ -30,7 +30,7 @@ var cells = [
   "tile1_0.png",
   "tile2_0.png",
   "tile3_0.png",
-  
+
   "tile0_1.png", // round about
   "tile1_1.png",
   "tile2_1.png",
@@ -44,21 +44,21 @@ var cells = [
   "tile0_3.png", // straight
   "tile1_3.png",
   
-  //"tile0_4.png", // other (replace by round about for easy mode)
-  //"tile1_4.png",
-  //"tile2_4.png",
-  "tile0_1.png", // round about
-  "tile1_1.png",
-  "tile2_1.png",
+  "tile0_4.png", // other (replace by round about for easy mode)
+  "tile1_4.png",
+  "tile2_4.png",
+  //"tile0_1.png", // round about
+  //"tile1_1.png",
+  //"tile2_1.png",*/
 ];
 
 seed = 0xdeadbeaf;
 document.write("Maze build with "+cells.length+" cell type<br/>");
 document.write("<table cellspacing=0 cellpadding=0>");
-for (y = -32; y < 128 ; y++)
+for (y = -16; y < 16 ; y++)
 {
   document.write('<tr>');
-  for (x=-32; x < 32 ; x++)
+  for (x=-16; x < 16 ; x++)
   {
     r = Math.floor(Math.random() * cells.length);
     

@@ -1,0 +1,239 @@
+<html>
+<style>
+table, th, td {
+  border: 0px solid black;
+  border-collapse: collapse;
+}
+
+
+
+img {
+  image-rendering: pixelated
+}
+</style>
+
+<script>
+var MAZE_W = 16;
+var MAZE_H = 16;
+var CELLS;
+var PLAYER = Array(3).fill().map(entry => Array(3));
+var MAZE = Array(MAZE_W).fill().map(entry => Array(MAZE_H));
+function initCells()
+{
+  PLAYER[0][0]="player_0_0.png";
+  PLAYER[0][1]="player_0_1.png";
+  PLAYER[0][2]="player_0_2.png";
+  PLAYER[1][0]="player_1_0.png";
+  PLAYER[1][1]="player_1_1.png";
+  PLAYER[1][2]="player_1_2.png";
+  PLAYER[2][0]="player_2_0.png";
+  PLAYER[2][1]="player_2_1.png";
+  PLAYER[2][2]="player_2_2.png";
+  CELLS = [
+  "tile0_0.png", // Basic turn
+  "tile1_0.png",
+  "tile2_0.png",
+  "tile3_0.png",
+
+  "tile0_1.png", // round about
+  "tile1_1.png",
+  "tile2_1.png",
+  "tile3_1.png",
+  
+  "tile0_2.png", // T junctions
+  "tile1_2.png",
+  "tile2_2.png",
+  "tile3_2.png",
+  
+  "tile0_3.png", // straight
+  "tile1_3.png",
+  
+  "tile0_4.png", // other (replace by round about for easy mode)
+  "tile1_4.png",
+  "tile2_4.png",
+  ];
+  return true;
+}
+
+function getCellType(x,y,seed)
+{
+  mix = xorShift64(x) + (xorShift64(y) << 32) + 0xCAFEBABE + seed;
+  return xorShift64(mix);
+}
+
+function xorShift64( a) {
+    a ^= (a << 21);
+    a ^= (a >>> 35);
+    a ^= (a << 4);
+    return a;
+}
+seed = 0;
+function drawMaze(initx,inity, playerx, playery)
+{
+  T = new Date().getMilliseconds();
+  log = document.getElementById('info');
+  log.innerHTML="x="+initx+" ; y="+inity+ " ; userX="+playerx+" ; userY = "+playery;
+  xx = yy = 0;
+  for(y = inity; y < inity+MAZE_H; y++)
+  {
+    yy++;
+    for(x = initx; x < initx+MAZE_W ; x++)
+    {
+      xx++;
+      //r = Math.floor(Math.random() * CELLS.length);
+      
+      r = getCellType(x,y,seed);
+      r = Math.trunc(Math.abs(r)) % CELLS.length;
+      cell = MAZE[x - initx][y - inity];
+      cell.style.backgroundImage = "url(" + CELLS[r] + ")";
+      cell.celltype = r;
+      
+      if (xx == MAZE_W/2 && yy == MAZE_H/2)
+      {
+        cell.innerHTML="<img width=18px height=18px src='"+ PLAYER[playerx+1][playery+1] +"'/>";
+      }
+      else
+        cell.innerHTML="";
+      
+    }
+    xx = 0;
+  }
+  T = (new Date().getMilliseconds()) - T;
+  log.innerHTML = log.innerHTML + "<br>"+T+" ms";
+  realPosX = (3*initx) + (playerx);
+  realPosY = (3*inity) + (playery);
+  //log.innerHTML = log.innerHTML + "<br>realPosX="+realPosX+" realPosY="+realPosY;
+  distance = Math.sqrt( (realPosX*realPosX) + (realPosY*realPosY));
+  log.innerHTML = log.innerHTML + "<br>distance "+distance.toFixed(2);
+  
+}
+
+function createMazeCells()
+{
+  maze = document.getElementById('mazeTable');
+  for(y = 0; y < MAZE_H; y++)
+  {
+    line = maze.insertRow();
+    for(x = 0; x < MAZE_W ; x++)
+    {
+      cell = line.insertCell();    
+      cell.style = "background-repeat: no-repeat; background-size: 100% 100%; image-rendering: pixelated";
+      cell.style.backgroundImage = "url(tile0_1.png)";
+      cell.width = "18px";
+      cell.height= "18px";
+      if (x == MAZE_W/2 && y == MAZE_H/2)
+      {
+        //cell.innerHTML="<img width=18px height=18px src='player.png'/>";
+      }
+      //cell.innerHTML = "<table><tr><td>1</td><td>2</td><td>3</td></tr></table>";
+      MAZE[x][y] = cell;
+    }
+  }
+}
+
+function goUp()
+{
+  //userY = userY - 1;
+  //drawMaze(userX, userY);
+  userCellY = userCellY - 1;
+  if (userCellY < -1)
+  {
+    userCellY = 1;
+    userY = userY - 1;
+  }
+  drawMaze(userX, userY, userCellX, userCellY);
+    
+}
+
+function goDown()
+{
+  userCellY = userCellY + 1;
+  if (userCellY > 1)
+  {
+    userCellY = -1;
+    userY = userY + 1;
+  }
+  drawMaze(userX, userY, userCellX, userCellY);
+}
+
+function goLeft()
+{
+  userCellX = userCellX - 1;
+  if (userCellX < -1)
+  {
+    userX = userX - 1;
+    userCellX = 1;
+  }
+  
+  drawMaze(userX, userY, userCellX, userCellY);
+}
+
+function goRight()
+{
+  userCellX = userCellX + 1;
+  if (userCellX > 1)
+  {
+    userX = userX + 1;
+    userCellX = -1;
+  }
+  drawMaze(userX, userY, userCellX, userCellY);
+}
+userX = 0;
+userY = 0;
+userCellX=0;
+userCellY=0;
+
+document.addEventListener('keydown', userKeyDown);
+function userKeyDown(event)
+{
+  e = event.key;
+  if (e == "ArrowLeft")
+  {
+    event.preventDefault();
+    goLeft();
+  }
+  else if (e == "ArrowRight")
+  {
+    event.preventDefault();
+    goRight();
+  }
+  else if (e == "ArrowUp")
+  {
+    event.preventDefault();
+    goUp();
+  }
+  else if (e == "ArrowDown")
+  {
+    event.preventDefault();
+    goDown();
+  }
+  return false;
+}
+
+</script>
+<table border=1 cellspacing=0 cellpadding=0 id="mazeTable">
+</table>
+<table border=1>
+  <tr>
+    <td></td>
+    <td><button onclick="goUp(); return false;">/\</button></td>
+    <td></td>
+    <td rowspan=2><pre id="info"></pre></td>
+  </tr>
+  <tr>
+    <td><button onclick="goLeft(); return false;"/> < </button></td><td></td><td><button onclick="goRight(); return false;"> > </button></td><td> </td>
+  </tr>
+  <tr>
+    <td></td>
+    <td><button onclick="goDown(); return false;">\/</button></td>
+    <td></td>
+    <td> </td>
+  </tr>
+<table>
+
+<script>
+  initCells();
+  createMazeCells();
+  drawMaze(userX, userY, userCellX, userCellY);
+</script>
+</html>
